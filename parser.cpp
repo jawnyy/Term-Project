@@ -4,6 +4,7 @@
 #include <map>
 using namespace std;
 
+// Declare functions
 int charClass;
 char lexeme[100];
 char nextChar;
@@ -18,9 +19,25 @@ void getChar();
 void getNonBlank();
 int lex();
 
+// Symbol Info Structure
+struct SymbolInfo {
+    string name;
+    int type;
+};
+
+// Symbol table
+map<int, SymbolInfo> symbolTable;
+
+// Semantic error tracking
+//vector<string> semanticErrors;
+
 /* Character classes */
 #define LETTER 0
 #define DIGIT 1
+#define COMMA 2
+#define COLON 3
+#define SEMI 4
+#define EQUAL 5
 #define UNKNOWN 99
 
 /* Token codes */
@@ -47,6 +64,8 @@ int lex();
 #define NUM 50
 #define TYPE 51
 
+int j = 0;
+
 int main() {
     // Uncomment this later, for easier testing purposes.
     /*
@@ -69,6 +88,10 @@ int main() {
         inputFile.close();
     }
 
+    for (const auto& pair : symbolTable) {
+        cout << pair.first << ": {" << pair.second.name << ", "<< pair.second.type << "}" << endl;
+    }
+
     return 0;
 }
 
@@ -76,18 +99,19 @@ int lookup(char ch) {
     switch (ch) {
         case ',':
             addChar();
-            nextToken = DECL_SEC;
+            nextToken = COMMA;
             break;
         case ':':
             addChar();
-            nextToken = DECL;
+            nextToken = COLON;
             break;
         case ';':
             addChar();
+            nextToken = SEMI;
             break;
         case '=':
             addChar();
-            nextToken = ASSIGN;
+            nextToken = EQUAL;
             break;
         case '(':
         case ')':
@@ -217,23 +241,11 @@ int lex() {
             lexeme[3] = 0;
             break;
     } /* End of switch */
-    cout << "Next token is: " << nextToken << ", Next lexeme is " << lexeme << endl;
+    // Book way of showing the lexeme and its value
+    // cout << "Next token is: " << nextToken << ", Next lexeme is " << lexeme << endl;
+    
+    symbolTable[j] =  {lexeme, nextToken};
+    j++;
     return nextToken;
 } /* End of function lex */
 
-
-/* Semantic Analyzer Components */
-
-// Symbol table entry structure
-struct SymbolInfo {
-    string name;
-    string type;      // "int", "float", "double"
-    bool initialized;
-    int scope;        // For nested scopes if needed
-};
-
-// Symbol table
-map<string, SymbolInfo> symbolTable;
-
-// Semantic error tracking
-vector<string> semanticErrors;
