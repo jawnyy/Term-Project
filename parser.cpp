@@ -2,6 +2,7 @@
 #include <fstream>
 #include <cctype>
 #include <map>
+#include <vector>
 using namespace std;
 
 // Declare functions
@@ -18,6 +19,8 @@ void addChar();
 void getChar();
 void getNonBlank();
 int lex();
+void startCheck();
+void check_semantics(int x);
 
 // Symbol Info Structure
 struct SymbolInfo {
@@ -29,7 +32,7 @@ struct SymbolInfo {
 map<int, SymbolInfo> symbolTable;
 
 // Semantic error tracking
-//vector<string> semanticErrors;
+vector<string> semanticErrors;
 
 /* Character classes */
 #define LETTER 0
@@ -90,6 +93,8 @@ int main() {
 
     for (const auto& pair : symbolTable) {
         cout << pair.first << ": {" << pair.second.name << ", "<< pair.second.type << "}" << endl;
+        startCheck();
+        //check_semantics(pair.second.type);
     }
 
     return 0;
@@ -248,4 +253,9 @@ int lex() {
     j++;
     return nextToken;
 } /* End of function lex */
+
+void startCheck() {
+    // If the first lexeme matches "PROGRAM", begin
+    // Maybe call another function that can continue to check.
+}
 
