@@ -19,13 +19,23 @@ void addChar();
 void getChar();
 void getNonBlank();
 int lex();
-void startCheck();
+void FirstRule();
+void SecondRule();
+void ThirdRule();
+void FourthRule();
+void FifthRule();
+void SixthRule();
+void SeventhRule();
+void EightRule();
+void NinthRule();
+void TenthRule();
 void check_semantics(int x);
 
 // Symbol Info Structure
 struct SymbolInfo {
     string name;
     int type;
+    int lineNumber;
 };
 
 // Symbol table
@@ -68,6 +78,7 @@ vector<string> semanticErrors;
 #define TYPE 51
 
 int j = 0;
+int countLineNumber = 0;
 
 int main() {
     // Uncomment this later, for easier testing purposes.
@@ -92,10 +103,13 @@ int main() {
     }
 
     for (const auto& pair : symbolTable) {
-        cout << pair.first << ": {" << pair.second.name << ", "<< pair.second.type << "}" << endl;
-        startCheck();
+        cout << pair.first << ": {" << pair.second.name << ", "<< pair.second.type << ", " << pair.second.lineNumber << "}" << endl;
         //check_semantics(pair.second.type);
     }
+
+    cout << "\nStart of the output we should see \n\n";
+
+    FirstRule();
 
     return 0;
 }
@@ -249,13 +263,29 @@ int lex() {
     // Book way of showing the lexeme and its value
     // cout << "Next token is: " << nextToken << ", Next lexeme is " << lexeme << endl;
     
-    symbolTable[j] =  {lexeme, nextToken};
+    symbolTable[j] =  {lexeme, nextToken, countLineNumber};
     j++;
     return nextToken;
 } /* End of function lex */
 
-void startCheck() {
-    // If the first lexeme matches "PROGRAM", begin
-    // Maybe call another function that can continue to check.
+void FirstRule() {
+    if (!symbolTable.empty()) {
+        // Get the first element
+        auto it = symbolTable.begin();
+        // If the program starts with "program"
+        if (it->second.type == PROGRAM) {
+            cout << "PROGRAM" << endl;
+            // Delete the first element, get next
+            symbolTable.erase(it);
+            it = symbolTable.begin();
+            if (it->second.name == "begin") {
+                // Go to STMT_SEC
+            } else {
+                // DECL_SEC follows
+            }
+        } else {
+            cout << "Incorrect start of program!" << endl;
+        }
+    }
 }
 
