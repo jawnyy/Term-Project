@@ -268,6 +268,13 @@ int lex() {
     return nextToken;
 } /* End of function lex */
 
+/* Start of semantics portion */
+
+void NextLex(std::map<int, SymbolInfo>::iterator x) {
+    symbolTable.erase(x);
+    x = symbolTable.begin();
+}
+
 void FirstRule() {
     if (!symbolTable.empty()) {
         // Get the first element
@@ -276,8 +283,10 @@ void FirstRule() {
         if (it->second.type == PROGRAM) {
             cout << "PROGRAM" << endl;
             // Delete the first element, get next
-            symbolTable.erase(it);
-            it = symbolTable.begin();
+            NextLex(it); // TODO: I'm assuming it deletes the first value, but doesn't return the next value!!
+            cout << it->second.name << endl;
+            // symbolTable.erase(it);
+            // it = symbolTable.begin();
             if (it->second.name == "begin") {
                 // Go to STMT_SEC
             } else {
