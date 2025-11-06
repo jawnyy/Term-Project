@@ -3,6 +3,7 @@
 #include <cctype>
 #include <map>
 #include <vector>
+#include <string>
 using namespace std;
 
 // Declare functions
@@ -19,16 +20,24 @@ void addChar();
 void getChar();
 void getNonBlank();
 int lex();
-void FirstRule();
-void SecondRule();
-void ThirdRule();
-void FourthRule();
-void FifthRule();
-void SixthRule();
-void SeventhRule();
-void EightRule();
-void NinthRule();
-void TenthRule();
+void PROGRAM01();
+void DECL_SEC02();
+void DECL03();
+void ID_LIST04();
+void ID05();
+void STMT_SEC06();
+void STMT07();
+void ASSIGN08();
+void IFSTMT09();
+void WHILESTMT10();
+void INPUT11();
+void OUTPUT12();
+void EXPR13();
+void FACTOR14();
+void OPERAND15();
+void NUM16();
+void COMP17();
+void TYPE18();
 void check_semantics(int x);
 
 // Symbol Info Structure
@@ -40,6 +49,7 @@ struct SymbolInfo {
 
 // Symbol table
 map<int, SymbolInfo> symbolTable;
+std::map<int, SymbolInfo>::iterator point;
 
 // Semantic error tracking
 vector<string> semanticErrors;
@@ -109,7 +119,7 @@ int main() {
 
     cout << "\nStart of the output we should see \n\n";
 
-    FirstRule();
+    PROGRAM01();
 
     return 0;
 }
@@ -270,31 +280,119 @@ int lex() {
 
 /* Start of semantics portion */
 
-void NextLex(std::map<int, SymbolInfo>::iterator x) {
-    symbolTable.erase(x);
-    x = symbolTable.begin();
+void NextLex() {
+    symbolTable.erase(point);
+    point = symbolTable.begin();
 }
 
-void FirstRule() {
+void PROGRAM01() {
     if (!symbolTable.empty()) {
         // Get the first element
-        auto it = symbolTable.begin();
+        point = symbolTable.begin();
         // If the program starts with "program"
-        if (it->second.type == PROGRAM) {
+        if (point->second.type == PROGRAM) {
             cout << "PROGRAM" << endl;
             // Delete the first element, get next
-            NextLex(it); // TODO: I'm assuming it deletes the first value, but doesn't return the next value!!
-            cout << it->second.name << endl;
-            // symbolTable.erase(it);
-            // it = symbolTable.begin();
-            if (it->second.name == "begin") {
+            NextLex(); 
+            if (point->second.name == "begin") {
                 // Go to STMT_SEC
+                STMT_SEC06();
             } else {
                 // DECL_SEC follows
+                DECL_SEC02();
             }
         } else {
             cout << "Incorrect start of program!" << endl;
         }
     }
+}
+
+void DECL_SEC02() {
+    vector<string> idList;
+
+    while (point->second.name != ";") {
+        idList.push_back(point->second.name);
+        cout << point->second.name << endl;
+        NextLex();
+    }
+    if (idList.back() != "int" && idList.back() != "double" && idList.back() != "float") {
+        cout << "Error, wrong type declared!" << endl;
+        exit(1);
+    }
+
+    // TODO: Need to check before the ':' since type is at end for reserved words
+    //auto reservedId = find(idList.begin(), idList.back(), " program", "begin", "end", "if", "then", "else", "input", "output", "int", "while", "loop")
+    
+    NextLex();
+    
+    // count the number of commas+1 to display ID_LIST amount of times
+    // TODO: Figure out if this goes 
+    int countCommas = count(idList.begin(), idList.end(), ",") + 1;
+    cout << "# of times to print ID_LIST: " << countCommas << endl;
+    // can also skip "begin" here
+}
+
+void DECL03() {
+    cout << point->second.name << endl;
+}
+
+void ID_LIST04() {
+    cout << point->second.name << endl;
+}
+
+void ID05() {
+    cout << point->second.name << endl;
+}
+
+void STMT_SEC06()  {
+    cout << point->second.name << endl;
+}
+
+void STMT07() {
+    cout << point->second.name << endl;
+}
+
+void ASSIGN08() {
+    cout << point->second.name << endl;
+}
+
+void IFSTMT09() {
+    cout << point->second.name << endl;
+}
+
+void WHILESTMT10() {
+    cout << point->second.name << endl;
+}
+
+void INPUT11() {
+    cout << point->second.name << endl;
+}
+
+void OUTPUT12() {
+    cout << point->second.name << endl;
+}
+
+void EXPR13() {
+    cout << point->second.name << endl;
+}
+
+void FACTOR14() {
+    cout << point->second.name << endl;
+}
+
+void OPERAND15() {
+    cout << point->second.name << endl;
+}
+
+void NUM16() {
+    cout << point->second.name << endl;
+}
+
+void COMP17() {
+    cout << point->second.name << endl;
+}
+
+void TYPE18() {
+    cout << point->second.name << endl;
 }
 
