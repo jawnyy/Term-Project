@@ -4,6 +4,7 @@
 #include <map>
 #include <vector>
 #include <string>
+#include <algorithm>
 using namespace std;
 
 // Declare functions
@@ -285,6 +286,20 @@ void NextLex() {
     point = symbolTable.begin();
 }
 
+void CheckReservedWord() {
+    if (point->second.name == " program" || point->second.name == "begin" || point->second.name == "end" || 
+        point->second.name == "if" || point->second.name == "then" || point->second.name == "else" || 
+        point->second.name == "input" || point->second.name == "output" || point->second.name == "int" || 
+        point->second.name == "while" || point->second.name == "loop") {
+            cout << "Error, invalid identifier name!" << endl;
+            exit(1);
+    }
+}
+
+void CheckType() {
+
+}
+
 void PROGRAM01() {
     if (!symbolTable.empty()) {
         // Get the first element
@@ -309,26 +324,41 @@ void PROGRAM01() {
 
 void DECL_SEC02() {
     vector<string> idList;
+    bool colonCheck = true;
 
+    cout << "DECL_SEC" << endl;
     while (point->second.name != ";") {
+        while (point->second.name != ":" && colonCheck) {
+            CheckReservedWord();
+            idList.push_back(point->second.name);
+            NextLex();
+        }
+        colonCheck = false;
         idList.push_back(point->second.name);
-        cout << point->second.name << endl;
         NextLex();
     }
+    cout << "DECL" << endl;
     if (idList.back() != "int" && idList.back() != "double" && idList.back() != "float") {
         cout << "Error, wrong type declared!" << endl;
         exit(1);
     }
-
-    // TODO: Need to check before the ':' since type is at end for reserved words
-    //auto reservedId = find(idList.begin(), idList.back(), " program", "begin", "end", "if", "then", "else", "input", "output", "int", "while", "loop")
     
     NextLex();
     
     // count the number of commas+1 to display ID_LIST amount of times
-    // TODO: Figure out if this goes 
     int countCommas = count(idList.begin(), idList.end(), ",") + 1;
-    cout << "# of times to print ID_LIST: " << countCommas << endl;
+    while (countCommas > 0) {
+        cout << "ID_LIST" << endl;
+        countCommas--;
+    }
+
+    // Checks for more declaration sections.
+    if (point->second.name == "begin") {
+        STMT_SEC06();
+    } else {
+        DECL_SEC02();
+    }
+
     // can also skip "begin" here
 }
 
@@ -345,7 +375,9 @@ void ID05() {
 }
 
 void STMT_SEC06()  {
+    NextLex();
     cout << point->second.name << endl;
+    // TODO: Goes to input here, going to have to separate ID_LIST.
 }
 
 void STMT07() {
