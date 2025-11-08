@@ -50,6 +50,7 @@ struct SymbolInfo {
 
 // Symbol table
 map<int, SymbolInfo> symbolTable;
+vector<string> idTable;
 std::map<int, SymbolInfo>::iterator point;
 
 // Semantic error tracking
@@ -293,6 +294,14 @@ void CheckReservedWord() {
         point->second.name == "while" || point->second.name == "loop") {
             cout << "Error, invalid identifier name!" << endl;
             exit(1);
+    } else {
+        auto dupCheck = find(idTable.begin(), idTable.end(), point->second.name);
+        if (dupCheck != idTable.end()) {
+            cout << "Duplicate id declaration found!" << endl;
+            exit(2);
+        } else if (point->second.name != ",") {
+            idTable.push_back(point->second.name);
+        } 
     }
 }
 
@@ -323,35 +332,24 @@ void PROGRAM01() {
 }
 
 void DECL_SEC02() {
-    vector<string> idList;
+    cout << "DECL_SEC" << endl;
+    DECL03();
+}
+
+void DECL03() {
+    cout << "DECL" << endl;
     bool colonCheck = true;
 
-    cout << "DECL_SEC" << endl;
-    while (point->second.name != ";") {
-        while (point->second.name != ":" && colonCheck) {
-            CheckReservedWord();
-            idList.push_back(point->second.name);
-            NextLex();
-        }
-        colonCheck = false;
-        idList.push_back(point->second.name);
+    while (point->second.name != ":") {
+        ID_LIST04();
         NextLex();
     }
-    cout << "DECL" << endl;
-    if (idList.back() != "int" && idList.back() != "double" && idList.back() != "float") {
-        cout << "Error, wrong type declared!" << endl;
-        exit(1);
-    }
-    
+    NextLex();
+    TYPE18();
     NextLex();
     
-    // count the number of commas+1 to display ID_LIST amount of times
-    int countCommas = count(idList.begin(), idList.end(), ",") + 1;
-    while (countCommas > 0) {
-        cout << "ID_LIST" << endl;
-        countCommas--;
-    }
-
+    // TODO: Skip semicolon, need check here
+    NextLex();
     // Checks for more declaration sections.
     if (point->second.name == "begin") {
         STMT_SEC06();
@@ -362,12 +360,13 @@ void DECL_SEC02() {
     // can also skip "begin" here
 }
 
-void DECL03() {
-    cout << point->second.name << endl;
-}
-
 void ID_LIST04() {
-    cout << point->second.name << endl;
+    // TODO: Some call to ID that checks for correct syntax
+    if (point->second.name != ",") {
+        cout << "Checking for correct ID: " << point->second.name << endl;
+    }
+    CheckReservedWord();
+
 }
 
 void ID05() {
@@ -375,13 +374,32 @@ void ID05() {
 }
 
 void STMT_SEC06()  {
+    cout << "STMT_SEC\n";
     NextLex();
-    cout << point->second.name << endl;
-    // TODO: Goes to input here, going to have to separate ID_LIST.
+    STMT07();
 }
 
 void STMT07() {
-    cout << point->second.name << endl;
+    cout << "STMT\n";
+    if (point->second.type == ASSIGN) {
+        cout << "ASSIGN\n";
+        ASSIGN08();
+    } else if (point->second.type == IFSTMT) {
+        cout << "IF_STMT\n";
+        IFSTMT09();
+    } else if (point->second.type == WHILESTMT) {
+        cout << "WHILE_STMT\n";
+        WHILESTMT10();
+    } else if (point->second.type == INPUT) {
+        cout << "INPUT\n";
+        INPUT11();
+    } else if (point->second.type == OUTPUT) {
+        cout << "OUTPUT\n";
+        OUTPUT12();
+    } else {
+        cout << "Incorrect statement!\n";
+        exit(3);
+    }
 }
 
 void ASSIGN08() {
@@ -398,6 +416,10 @@ void WHILESTMT10() {
 
 void INPUT11() {
     cout << point->second.name << endl;
+    // TODO: Figure out how to handle line 6 in input file
+    for (auto xyz : idTable){
+        cout << xyz << " ";
+    }
 }
 
 void OUTPUT12() {
@@ -425,6 +447,9 @@ void COMP17() {
 }
 
 void TYPE18() {
-    cout << point->second.name << endl;
+    if (point->second.name != "int" && point->second.name != "float" && point->second.name != "double") {
+        cout << "Error, wrong type declared!\n";
+        exit(1);
+    }
 }
 
