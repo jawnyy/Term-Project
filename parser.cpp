@@ -246,7 +246,7 @@ void DECL_SEC02() {
 
 void DECL03() {
     cout << "DECL" << endl;
-    bool colonCheck = true;
+    bool colonCheck = false;
 
     while (point->second.name != ":") {
         ID_LIST04();
@@ -257,6 +257,7 @@ void DECL03() {
     NextLex();
     
     // TODO: Skip semicolon, need check here
+    cout << "Semicolon check here?? " << point->second.name << endl;
     NextLex();
     // Checks for more declaration sections.
     if (point->second.name == "begin") {
@@ -270,10 +271,18 @@ void DECL03() {
 
 void ID_LIST04() {
     // TODO: Some call to ID that checks for correct syntax
+
+    // If type is in identifier list, then error (no colon)
+    if (point->second.name == "int" || point->second.name == "float" || point->second.name == "double") {
+        cout << "Expected colon in declaration section!\n";
+        exit(4);
+    }
+
+    // Skips the commas, not identifiers
     if (point->second.name != ",") {
         cout << "Checking for correct ID: " << point->second.name << endl;
+        CheckReservedWord();
     }
-    CheckReservedWord();
 
 }
 
