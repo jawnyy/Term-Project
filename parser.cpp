@@ -331,12 +331,13 @@ void STMT07() {
         cout << "OUTPUT\n";
         OUTPUT12();
     } else {
-        cout << point->second.name << " is a assign statement\n";
-        exit(3);
+        // Making strong assumption that if nothing else, it has to be ASSIGN statement.
+        ASSIGN08();
     }
 }
 
 void ASSIGN08() {
+    // TODO: Start/finish this!!
     cout << point->second.name << endl;
 }
 
