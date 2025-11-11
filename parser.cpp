@@ -213,10 +213,6 @@ void CheckReservedWord() {
     }
 }
 
-void CheckType() {
-
-}
-
 void PROGRAM01() {
     if (!symbolTable.empty()) {
         // Get the first element
@@ -256,8 +252,12 @@ void DECL03() {
     TYPE18();
     NextLex();
     
-    // TODO: Skip semicolon, need check here
-    cout << "Semicolon check here?? " << point->second.name << endl;
+    // Semicolon ends the line, else syntax error.
+    if (point->second.name != ";") {
+        cout << "Expected semicolon!\n";
+        exit(4);
+    }
+
     NextLex();
     // Checks for more declaration sections.
     if (point->second.name == "begin") {
@@ -270,24 +270,43 @@ void DECL03() {
 }
 
 void ID_LIST04() {
-    // TODO: Some call to ID that checks for correct syntax
-
+    
     // If type is in identifier list, then error (no colon)
     if (point->second.name == "int" || point->second.name == "float" || point->second.name == "double") {
         cout << "Expected colon in declaration section!\n";
         exit(4);
     }
-
+    
+    
     // Skips the commas, not identifiers
     if (point->second.name != ",") {
-        cout << "Checking for correct ID: " << point->second.name << endl;
+
+        // Call to ID that checks for correct syntax.
+        ID05();
+
+        // Check if the id name is valid.
         CheckReservedWord();
+        cout << "ID_LIST\n";
     }
 
 }
 
 void ID05() {
-    cout << point->second.name << endl;
+    int idLength = point->second.name.length() - 1;
+
+    if (isalpha(point->second.name[0]) || point->second.name[0] == '_') {
+        for (int i = 1; i <= idLength; i++) {
+            if (isalnum(point->second.name[i]) || point->second.name[i] == '_') {
+                continue;
+            }else{
+                cout << "Invalid character in identifier!\n";
+                exit(5);
+            }
+        }
+    }else{
+        cout << "Invalid character in identifier!\n";
+        exit(5);
+    }
 }
 
 void STMT_SEC06()  {
@@ -298,10 +317,7 @@ void STMT_SEC06()  {
 
 void STMT07() {
     cout << "STMT\n";
-    if (point->second.type == ASSIGN) {
-        cout << "ASSIGN\n";
-        ASSIGN08();
-    } else if (point->second.type == IFSTMT) {
+    if (point->second.type == IFSTMT) {
         cout << "IF_STMT\n";
         IFSTMT09();
     } else if (point->second.type == WHILESTMT) {
@@ -309,12 +325,13 @@ void STMT07() {
         WHILESTMT10();
     } else if (point->second.type == INPUT) {
         cout << "INPUT\n";
+        NextLex(); // if others not working, may need this also!!
         INPUT11();
     } else if (point->second.type == OUTPUT) {
         cout << "OUTPUT\n";
         OUTPUT12();
     } else {
-        cout << "Incorrect statement!\n";
+        cout << point->second.name << " is a assign statement\n";
         exit(3);
     }
 }
@@ -332,10 +349,24 @@ void WHILESTMT10() {
 }
 
 void INPUT11() {
-    cout << point->second.name << endl;
-    // TODO: Figure out how to handle line 6 in input file
-    for (auto xyz : idTable){
-        cout << xyz << " ";
+    // Whenever there is an INPUT, the variables have to be in idList.
+    if (point->second.name != ";") {
+        if (point->second.name != ",") {
+            auto idTableCheck = find(idTable.begin(), idTable.end(), point->second.name);
+            if (idTableCheck != idTable.end()) {
+                cout << "ID_LIST\n";
+                NextLex();
+                INPUT11();
+            } else {
+                cout << "Undeclared variable found! => " << point->second.name << endl;
+                exit(11);
+            }
+        } else {
+            NextLex();
+            INPUT11();
+        }
+    } else {
+        STMT_SEC06();
     }
 }
 
