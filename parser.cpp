@@ -385,11 +385,11 @@ void INPUT11() {
 }
 
 void OUTPUT12() {
-    cout << point->second.name << endl;
+    cout << "At output ----> " << point->second.name << endl;
+    // It either goes to ID_LIST or NUM
 }
 
 void EXPR13() {
-    // EXPR -> FACTOR | FACTOR + EXPR | FACTOR - EXPR
     // IDEA: Call FACTOR first and then if the next lexeme is a plus then we call EXPR again 
     cout << "EXPR\n";
     FACTOR14();
@@ -402,7 +402,7 @@ void EXPR13() {
         }
         //NextLex();
     } else {
-        cout << "End of ASSIGN here ----> " << point->second.name << " <----- call to STMT_SEC06 ?????"<< endl;
+        STMT_SEC06();
     }
 }
 
@@ -427,7 +427,28 @@ void OPERAND15() {
 }
 
 void NUM16() {
-    cout << point->second.name << endl;
+    // WARNING: Untested function!!!!
+
+    int idLength = point->second.name.length() - 1;
+
+    if (idLength > 10) {
+        cout << point->second.name << " : Number too long!\n";
+        exit(16);
+    } else {
+        if (isdigit(point->second.name[0])) {
+            for (int i = 1; i <= idLength; i++) {
+                if (isdigit(point->second.name[i]) || point->second.name == ".") {
+                    continue;
+                }else{
+                    cout << point->second.name << " : Invalid character in number!\n";
+                    exit(16);
+                }
+            }
+        }else{
+            cout << point->second.name << " : Number must start with valid digit!\n";
+            exit(16);
+        }
+    }
 }
 
 void COMP17() {
