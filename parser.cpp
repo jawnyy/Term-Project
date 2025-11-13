@@ -389,15 +389,41 @@ void OUTPUT12() {
 }
 
 void EXPR13() {
-    cout << point->second.name << endl;
+    // EXPR -> FACTOR | FACTOR + EXPR | FACTOR - EXPR
+    // IDEA: Call FACTOR first and then if the next lexeme is a plus then we call EXPR again 
+    cout << "EXPR\n";
+    FACTOR14();
+    if (point->second.name != ";") {
+        //NextLex();
+        if (point->second.name == "+" || point->second.name == "-") {
+            NextLex();
+            EXPR13();
+            //FACTOR14();
+        }
+        //NextLex();
+    } else {
+        cout << "End of ASSIGN here ----> " << point->second.name << " <----- call to STMT_SEC06 ?????"<< endl;
+    }
 }
 
 void FACTOR14() {
-    cout << point->second.name << endl;
+    // FACTOR -> OPERAND | OPERAND * FACTOR | OPERAND / FACTOR
+    cout << "FACTOR\n";
+    OPERAND15();
+    if (point->second.name == "*" || point->second.name == "/") {
+        FACTOR14();
+    }
+    //NextLex();
+    //OPERAND15();
 }
 
 void OPERAND15() {
-    cout << point->second.name << endl;
+    // OPERAND -> NUM | ID | ( EXPR )
+    // TODO: IDK WHAT THIS REALLY MEANS LOL!!!!!
+    cout << "OPERAND\n";
+    NextLex();
+    //NUM16();
+
 }
 
 void NUM16() {
