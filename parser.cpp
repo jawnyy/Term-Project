@@ -337,8 +337,21 @@ void STMT07() {
 }
 
 void ASSIGN08() {
-    // TODO: Start/finish this!!
-    cout << point->second.name << endl;
+    // Checks if valid identifier.
+    ID05(); 
+    NextLex();
+
+    int keyVal = point->first;
+    auto pointNext = symbolTable.find(keyVal); // points at ":"
+    auto pointNextNext = std::next(pointNext); // points at "="
+    if (pointNext->second.name == ":" && pointNextNext->second.name == "="){
+        // Correct assigment operator.
+        cout << "ASSIGN\n";
+        NextLex();
+        NextLex();
+
+        EXPR13();
+    }
 }
 
 void IFSTMT09() {
