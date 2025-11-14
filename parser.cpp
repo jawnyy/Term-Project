@@ -74,7 +74,7 @@ int lookup(char ch) {
             break;
         default:
             addChar();
-            nextToken = EOF;
+            nextToken = UNKNOWN;
             break;
     }
     return nextToken;
@@ -119,15 +119,24 @@ void addChar() {
 void getChar() {
     nextChar = inputFile.get();
     if (inputFile.good()) {
-        if (isalpha(nextChar))
+        if (nextChar == '\n') {
+            cout << "Going from ---> " << countLineNumber << endl;
+            countLineNumber++;
+            cout << "Now at ---> " << countLineNumber << endl;
+        }
+        if (isalpha(nextChar)) {
             charClass = LETTER;
-        else if (isdigit(nextChar))
+        }
+        else if (isdigit(nextChar)) {
             charClass = DIGIT;
-        else 
+        }
+        else {
             charClass = UNKNOWN;
+        }
     }
-    else
+    else {
         charClass = EOF;
+    }
 }
 
 /*****************************************************/
@@ -387,6 +396,12 @@ void INPUT11() {
 void OUTPUT12() {
     cout << "At output ----> " << point->second.name << endl;
     // It either goes to ID_LIST or NUM
+    NextLex();
+    cout << "Checking if in idTable ----> " << point->second.name << endl;
+    auto idTableCheck = find(idTable.begin(), idTable.end(), point->second.name);
+    if (idTableCheck != idTable.end()) {
+        cout << "FOUND, go to ID_LIST\n";
+    }
 }
 
 void EXPR13() {
@@ -420,6 +435,7 @@ void FACTOR14() {
 void OPERAND15() {
     // OPERAND -> NUM | ID | ( EXPR )
     // TODO: IDK WHAT THIS REALLY MEANS LOL!!!!!
+    // If either of those 3 options (like TYPE func), then print OPERAND
     cout << "OPERAND\n";
     NextLex();
     //NUM16();
