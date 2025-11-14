@@ -8,7 +8,7 @@ int main() {
     cin >> fileName;
     ifstream inputFile(fileName);
     */
-    inputFile.open("input1.txt");
+    inputFile.open("input2.txt");
     int i = 1;
 
     if (!inputFile) {
@@ -120,9 +120,9 @@ void getChar() {
     nextChar = inputFile.get();
     if (inputFile.good()) {
         if (nextChar == '\n') {
-            cout << "Going from ---> " << countLineNumber << endl;
+            //cout << "Going from ---> " << countLineNumber << endl;
             countLineNumber++;
-            cout << "Now at ---> " << countLineNumber << endl;
+            //cout << "Now at ---> " << countLineNumber << endl;
         }
         if (isalpha(nextChar)) {
             charClass = LETTER;
@@ -326,18 +326,21 @@ void STMT_SEC06()  {
 
 void STMT07() {
     cout << "STMT\n";
-    if (point->second.type == IFSTMT) {
+    if (point->second.name == "if") {
         cout << "IF_STMT\n";
+        NextLex();
         IFSTMT09();
-    } else if (point->second.type == WHILESTMT) {
+    } else if (point->second.name == "while") {
         cout << "WHILE_STMT\n";
+        NextLex();
         WHILESTMT10();
     } else if (point->second.type == INPUT) {
         cout << "INPUT\n";
-        NextLex(); // if others not working, may need this also!!
+        NextLex();
         INPUT11();
     } else if (point->second.type == OUTPUT) {
         cout << "OUTPUT\n";
+        NextLex();
         OUTPUT12();
     } else {
         // Making strong assumption that if nothing else, it has to be ASSIGN statement.
@@ -364,11 +367,15 @@ void ASSIGN08() {
 }
 
 void IFSTMT09() {
-    cout << point->second.name << endl;
+    // TODO
+    cout << "At IFSTMT09 ---> " << point->second.name << endl;
+    COMP17();
 }
 
 void WHILESTMT10() {
-    cout << point->second.name << endl;
+    // TODO
+    cout << "At WHILESTMT10 ---> " <<  point->second.name << endl;
+    COMP17();
 }
 
 void INPUT11() {
@@ -394,13 +401,12 @@ void INPUT11() {
 }
 
 void OUTPUT12() {
-    cout << "At output ----> " << point->second.name << endl;
-    // It either goes to ID_LIST or NUM
-    NextLex();
-    cout << "Checking if in idTable ----> " << point->second.name << endl;
+    // It either goes to ID_LIST or NUM, this assumes no other possibility.
     auto idTableCheck = find(idTable.begin(), idTable.end(), point->second.name);
     if (idTableCheck != idTable.end()) {
-        cout << "FOUND, go to ID_LIST\n";
+        cout << "ID_LIST\n";
+    } else {
+        NUM16();
     }
 }
 
@@ -468,7 +474,8 @@ void NUM16() {
 }
 
 void COMP17() {
-    cout << point->second.name << endl;
+    // TODO
+    cout << "At COMP17 ---> " << point->second.name << endl;
 }
 
 void TYPE18() {
