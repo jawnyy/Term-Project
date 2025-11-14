@@ -368,8 +368,10 @@ void ASSIGN08() {
 
 void IFSTMT09() {
     // TODO
+    // if COMP then STMT_SEC end if ; | if COMP then STMT_SEC else STMT_SEC end if ;
     cout << "At IFSTMT09 ---> " << point->second.name << endl;
     COMP17();
+    cout << "Should be then ---> " << point->second.name << endl;
 }
 
 void WHILESTMT10() {
@@ -402,6 +404,7 @@ void INPUT11() {
 
 void OUTPUT12() {
     // It either goes to ID_LIST or NUM, this assumes no other possibility.
+    // TODO: May have to redo/add to this one!!!
     auto idTableCheck = find(idTable.begin(), idTable.end(), point->second.name);
     if (idTableCheck != idTable.end()) {
         cout << "ID_LIST\n";
@@ -474,8 +477,23 @@ void NUM16() {
 }
 
 void COMP17() {
-    // TODO
-    cout << "At COMP17 ---> " << point->second.name << endl;
+    // Takes the comparison section of loops and verifies the correct syntax.
+    if (point->second.name == "(") {
+        NextLex();
+        auto pointLex = point->second.name;
+        while (point->second.name != ")") {
+            if (point->second.type == NUM || point->second.type == ID) {
+                OPERAND15();
+            } else {
+                // <>, <, >, =
+                NextLex();
+            }
+        }
+        NextLex();
+    } else {
+        cout << "Missing opening parenthesis at line " << point->second.lineNumber << endl;
+        exit(17);
+    }
 }
 
 void TYPE18() {
