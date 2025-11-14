@@ -91,4 +91,4 @@ vector<string> semanticErrors;
 #define TYPE 51
 
 int symbolTableIndex = 0;
-int countLineNumber = 0;
+int countLineNumber = 1;
