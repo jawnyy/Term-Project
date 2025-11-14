@@ -308,23 +308,25 @@ void ID05() {
             if (isalnum(point->second.name[i]) || point->second.name[i] == '_') {
                 continue;
             }else{
-                cout << "Invalid character in identifier!\n";
+                cout << point->second.name << " : Invalid character in identifier 1!\n";
                 exit(5);
             }
         }
     }else{
-        cout << "Invalid character in identifier!\n";
+        cout << point->second.name << " : Invalid character in identifier 2!\n";
         exit(5);
     }
 }
 
 void STMT_SEC06()  {
+    // Function that just calls STMT07.
     cout << "STMT_SEC\n";
     NextLex();
     STMT07();
 }
 
 void STMT07() {
+    // Checks for what type of statement was called.
     cout << "STMT\n";
     if (point->second.name == "if") {
         cout << "IF_STMT\n";
@@ -369,9 +371,14 @@ void ASSIGN08() {
 void IFSTMT09() {
     // TODO
     // if COMP then STMT_SEC end if ; | if COMP then STMT_SEC else STMT_SEC end if ;
-    cout << "At IFSTMT09 ---> " << point->second.name << endl;
     COMP17();
-    cout << "Should be then ---> " << point->second.name << endl;
+
+    if (point->second.name == "then") {
+        cout << "Test 1 ---> " <<  point->second.name << endl;
+        cout << "Test 2 ---> " <<  point->second.name << endl;
+        STMT_SEC06();
+
+    }
 }
 
 void WHILESTMT10() {
@@ -414,31 +421,26 @@ void OUTPUT12() {
 }
 
 void EXPR13() {
-    // IDEA: Call FACTOR first and then if the next lexeme is a plus then we call EXPR again 
+    // Calls FACTOR first and then if the next lexeme is a plus then we call EXPR again.
     cout << "EXPR\n";
     FACTOR14();
     if (point->second.name != ";") {
-        //NextLex();
         if (point->second.name == "+" || point->second.name == "-") {
             NextLex();
             EXPR13();
-            //FACTOR14();
         }
-        //NextLex();
     } else {
         STMT_SEC06();
     }
 }
 
 void FACTOR14() {
-    // FACTOR -> OPERAND | OPERAND * FACTOR | OPERAND / FACTOR
+    // Calls OPERAND first then if * or / it call itself again.
     cout << "FACTOR\n";
     OPERAND15();
     if (point->second.name == "*" || point->second.name == "/") {
         FACTOR14();
     }
-    //NextLex();
-    //OPERAND15();
 }
 
 void OPERAND15() {
@@ -453,7 +455,6 @@ void OPERAND15() {
 
 void NUM16() {
     // WARNING: Untested function!!!!
-
     int idLength = point->second.name.length() - 1;
 
     if (idLength > 10) {
@@ -479,8 +480,8 @@ void NUM16() {
 void COMP17() {
     // Takes the comparison section of loops and verifies the correct syntax.
     if (point->second.name == "(") {
+        cout << "COMP\n";
         NextLex();
-        auto pointLex = point->second.name;
         while (point->second.name != ")") {
             if (point->second.type == NUM || point->second.type == ID) {
                 OPERAND15();
