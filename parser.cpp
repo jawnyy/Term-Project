@@ -315,7 +315,7 @@ void ID05() {
     }else{
         cout << point->second.name << " : Invalid character in identifier 2!\n";
         exit(5);
-    }
+    }  
 }
 
 void STMT_SEC06()  {
@@ -344,6 +344,8 @@ void STMT07() {
         cout << "OUTPUT\n";
         NextLex();
         OUTPUT12();
+    } else if (point->second.name == "end") {
+        // Do nothing, just return to if or while loop.
     } else {
         // Making strong assumption that if nothing else, it has to be ASSIGN statement.
         ASSIGN08();
@@ -365,6 +367,9 @@ void ASSIGN08() {
         NextLex();
 
         EXPR13();
+    } else {
+        cout << point->second.name << " : Not a valid assignment!\n";
+        exit(8);
     }
 }
 
@@ -374,17 +379,41 @@ void IFSTMT09() {
     COMP17();
 
     if (point->second.name == "then") {
-        cout << "Test 1 ---> " <<  point->second.name << endl;
-        cout << "Test 2 ---> " <<  point->second.name << endl;
         STMT_SEC06();
+        //NextLex();
+
+        cout << point->second.name << " at " << point->first << endl;
+        //if ()
 
     }
 }
 
 void WHILESTMT10() {
-    // TODO
-    cout << "At WHILESTMT10 ---> " <<  point->second.name << endl;
+    // Done I think.
+    // while COMP loop STMT_SEC end loop ;
     COMP17();
+
+    if (point->second.name == "loop") {
+        STMT_SEC06();
+        if (point->second.name == "end") {
+            NextLex();
+            if (point->second.name == "loop") {
+                NextLex();
+                if (point->second.name != ";") {
+                    cout << "Error, expected ';' at end of while loop!\n";
+                    exit(10);
+                } else {
+                    NextLex();
+                }
+            } else {
+                cout << "Error, expected 'loop' at end of while loop!\n";
+                exit(10);
+            }
+        } else {
+            cout << "Error, expected 'end' at end of while loop!\n";
+            exit(10);
+        }
+    }
 }
 
 void INPUT11() {
@@ -439,6 +468,7 @@ void FACTOR14() {
     cout << "FACTOR\n";
     OPERAND15();
     if (point->second.name == "*" || point->second.name == "/") {
+        NextLex();
         FACTOR14();
     }
 }
