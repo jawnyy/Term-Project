@@ -54,8 +54,9 @@ map<int, SymbolInfo> symbolTable;
 vector<string> idTable;
 std::map<int, SymbolInfo>::iterator point;
 
-// Semantic error tracking
-vector<string> semanticErrors;
+// Identifier checks
+vector<string> idDeclared;
+vector<string> idInitialized;
 
 /* Character classes */
 #define LETTER 0
