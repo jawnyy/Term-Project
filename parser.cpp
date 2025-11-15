@@ -223,6 +223,7 @@ void CheckReservedWord() {
 }
 
 void PROGRAM01() {
+    // program DECL_SEC begin STMT_SEC end; | program begin STMT_SEC end;
     if (!symbolTable.empty()) {
         // Get the first element
         point = symbolTable.begin();
@@ -238,6 +239,20 @@ void PROGRAM01() {
                 // DECL_SEC follows
                 DECL_SEC02();
             }
+
+            if (point->second.name == "end") {
+                NextLex();
+                if (point->second.name == ";") {
+                    // Program ended successfully!
+                } else {
+                    cout << "Expected a ';' here!\n";
+                    exit(99);
+                }
+            } else {
+                cout << "Expected a 'end' here!\n";
+                exit(99);
+            }
+
         } else {
             cout << "Incorrect start of program!" << endl;
         }
@@ -332,10 +347,34 @@ void STMT07() {
         cout << "IF_STMT\n";
         NextLex();
         IFSTMT09();
+
+        if (point->second.type == OUTPUT) {
+            cout << "OUTPUT\n";
+            NextLex();
+            while (point->second.name != ";") {
+                if (point->second.name != ",") {
+                    OUTPUT12();
+                    NextLex();
+                } else {
+                    NextLex();
+                }
+            }
+            NextLex();
+        } else {
+            // Assuming that output follows right after the end of if loop.
+            cout << "Error, expected output here!\n";
+            exit(7);
+        }
     } else if (point->second.name == "while") {
         cout << "WHILE_STMT\n";
         NextLex();
         WHILESTMT10();
+
+        // TODO: Figure out if something needs to go here!!!
+        // Currently assumes that it no other statements follow (e.g. output)
+        cout << "Next lexeme after while loop is ---> " << point->second.name << endl;
+        cout << "Above or below this there is something extra (STMT_SEC and STMT)\n";
+        
     } else if (point->second.type == INPUT) {
         cout << "INPUT\n";
         NextLex();
@@ -374,7 +413,6 @@ void ASSIGN08() {
 }
 
 void IFSTMT09() {
-    // TODO
     // if COMP then STMT_SEC end if ; | if COMP then STMT_SEC else STMT_SEC end if ;
     COMP17();
 
@@ -382,8 +420,28 @@ void IFSTMT09() {
         STMT_SEC06();
         //NextLex();
 
-        cout << point->second.name << " at " << point->first << endl;
-        //if ()
+        if (point->second.name == "else") {
+            STMT_SEC06();
+        }
+
+        if (point->second.name == "end") {
+            NextLex();
+            if (point->second.name == "if") {
+                NextLex();
+                if (point->second.name != ";") {
+                    cout << "Error, expected ';' at end of if loop!\n";
+                    exit(10);
+                } else {
+                    NextLex();
+                }
+            } else {
+                cout << "Error, expected 'if' at end of if loop!\n";
+                exit(9);
+            }
+        } else {
+            cout << "Error, expected 'end' at end of if loop!\n";
+            exit(9);
+        }
 
     }
 }
