@@ -372,8 +372,6 @@ void STMT07() {
 
         // TODO: Figure out if something needs to go here!!!
         // Currently assumes that it no other statements follow (e.g. output)
-        cout << "Next lexeme after while loop is ---> " << point->second.name << endl;
-        cout << "Above or below this there is something extra (STMT_SEC and STMT)\n";
         
     } else if (point->second.type == INPUT) {
         cout << "INPUT\n";
@@ -509,6 +507,7 @@ void OUTPUT12() {
 
 void EXPR13() {
     // Calls FACTOR first and then if the next lexeme is a plus then we call EXPR again.
+    // EXPR -> FACTOR | FACTOR + EXPR | FACTOR - EXPR
     cout << "EXPR\n";
     FACTOR14();
     if (point->second.name != ";") {
@@ -517,7 +516,19 @@ void EXPR13() {
             EXPR13();
         }
     } else {
-        STMT_SEC06();
+        int keyVal = point->first;
+        auto pointNext = symbolTable.find(keyVal); // points at ""
+        auto pointNextNext = std::next(pointNext); // points at ""
+        auto pointNextNextNext = std::next(pointNextNext); // point at ??
+        // cout << "First lex: " << pointNext->second.name << endl;
+        // cout << "Second lex: " << pointNextNext->second.name << endl;
+        // cout << "Third lex: " << pointNextNextNext->second.name << endl;
+
+        if (pointNextNextNext->second.name == "loop") {
+            NextLex();
+        } else {
+            STMT_SEC06();
+        }
     }
 }
 
