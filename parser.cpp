@@ -8,7 +8,7 @@ int main() {
     cin >> fileName;
     ifstream inputFile(fileName);
     */
-    inputFile.open("input2.txt");
+    inputFile.open("input3.txt");
     int i = 1;
 
     if (!inputFile) {
@@ -240,7 +240,21 @@ void PROGRAM01() {
                 DECL_SEC02();
             }
 
+            int keyVal = point->first;
+            auto pointNext = symbolTable.find(keyVal);
+            auto pointNextNext = std::next(pointNext);
+            auto pointNextNextNext = std::next(pointNextNext);
             if (point->second.name == "end") {
+                NextLex();
+                if (point->second.name == ";") {
+                    // Program ended successfully!
+                } else {
+                    cout << "Expected a ';' here!\n";
+                    exit(99);
+                }
+            } else if (pointNextNextNext->second.name == "end") {
+                NextLex();
+                NextLex();
                 NextLex();
                 if (point->second.name == ";") {
                     // Program ended successfully!
@@ -256,6 +270,8 @@ void PROGRAM01() {
         } else {
             cout << "Incorrect start of program!" << endl;
         }
+
+        cout << "\n";
     }
 }
 
@@ -402,6 +418,11 @@ void ASSIGN08() {
         cout << "ASSIGN\n";
         NextLex();
         NextLex();
+        /*
+        auto idTableCheck = find(idTable.begin(), idTable.end(), point->second.name);
+        if (idTableCheck != idTable.end()) {
+        cout << "ID_LIST\n";
+        }*/
 
         EXPR13();
     } else {
@@ -437,6 +458,7 @@ void IFSTMT09() {
                 exit(9);
             }
         } else {
+            cout << point->second.name << endl;
             cout << "Error, expected 'end' at end of if loop!\n";
             exit(9);
         }
@@ -509,6 +531,15 @@ void EXPR13() {
     // Calls FACTOR first and then if the next lexeme is a plus then we call EXPR again.
     // EXPR -> FACTOR | FACTOR + EXPR | FACTOR - EXPR
     cout << "EXPR\n";
+    auto idTableCheck = find(idTable.begin(), idTable.end(), point->second.name);
+    if (idTableCheck == idTable.end()) {
+        if (isdigit(point->second.name[0])) {
+            // skip
+        } else {
+            cout << point->second.name << " : Variable not declared!\n";
+            exit(13);
+        }
+    }
     FACTOR14();
     if (point->second.name != ";") {
         if (point->second.name == "+" || point->second.name == "-") {
@@ -535,6 +566,15 @@ void EXPR13() {
 void FACTOR14() {
     // Calls OPERAND first then if * or / it call itself again.
     cout << "FACTOR\n";
+    auto idTableCheck = find(idTable.begin(), idTable.end(), point->second.name);
+    if (idTableCheck == idTable.end()) {
+        if (isdigit(point->second.name[0])) {
+            // skip
+        } else {
+            cout << point->second.name << " : Variable not declared!\n";
+            exit(13);
+        }
+    }
     OPERAND15();
     if (point->second.name == "*" || point->second.name == "/") {
         NextLex();
