@@ -8,7 +8,7 @@ int main() {
     cin >> fileName;
     ifstream inputFile(fileName);
     */
-    inputFile.open("input3.txt");
+    inputFile.open("input5.txt");
     int i = 1;
 
     if (!inputFile) {
@@ -339,12 +339,12 @@ void ID05() {
             if (isalnum(point->second.name[i]) || point->second.name[i] == '_') {
                 continue;
             }else{
-                cout << point->second.name << " : Invalid character in identifier 1!\n";
+                cout << point->second.name << " : Invalid character in identifier at " << point->first << endl;
                 exit(5);
             }
         }
     }else{
-        cout << point->second.name << " : Invalid character in identifier 2!\n";
+        cout << point->second.name << " : Invalid character in identifier at " << point->first << endl;
         exit(5);
     }  
 }
@@ -411,9 +411,9 @@ void ASSIGN08() {
     NextLex();
 
     int keyVal = point->first;
-    auto pointNext = symbolTable.find(keyVal); // points at ":"
-    auto pointNextNext = std::next(pointNext); // points at "="
-    if (pointNext->second.name == ":" && pointNextNext->second.name == "="){
+    auto pointAt = symbolTable.find(keyVal); // points at ":"
+    auto pointNext = std::next(pointAt); // points at "="
+    if (pointAt->second.name == ":" && pointNext->second.name == "="){
         // Correct assigment operator.
         cout << "ASSIGN\n";
         NextLex();
@@ -426,7 +426,8 @@ void ASSIGN08() {
 
         EXPR13();
     } else {
-        cout << point->second.name << " : Not a valid assignment!\n";
+        cout << point->second.name << " : Not a valid assignment at " << point->first << endl;
+        cout << pointAt->second.name << pointNext->second.name << endl;
         exit(8);
     }
 }
@@ -458,7 +459,7 @@ void IFSTMT09() {
                 exit(9);
             }
         } else {
-            cout << point->second.name << endl;
+            cout << point->second.name << " at " << point->first << endl;
             cout << "Error, expected 'end' at end of if loop!\n";
             exit(9);
         }
@@ -481,7 +482,17 @@ void WHILESTMT10() {
                     cout << "Error, expected ';' at end of while loop!\n";
                     exit(10);
                 } else {
-                    NextLex();
+                    int keyVal = point->first; // currently ';'
+                    auto pointNext = symbolTable.find(keyVal);
+                    auto pointNextNext = std::next(pointNext);
+                    //cout << point->second.name << pointNextNext->second.name << endl;
+                    if (pointNextNext->second.name == "else"){
+                        //NextLex();
+                        //STMT_SEC06();
+                        NextLex();
+                    } else {
+                        STMT_SEC06();
+                    }
                 }
             } else {
                 cout << "Error, expected 'loop' at end of while loop!\n";
@@ -557,7 +568,10 @@ void EXPR13() {
 
         if (pointNextNextNext->second.name == "loop") {
             NextLex();
+        } else if (pointNextNext->second.name == "else") {
+            NextLex();
         } else {
+            //cout << "For future problems ---------> " << pointNextNext->second.name << endl;
             STMT_SEC06();
         }
     }
