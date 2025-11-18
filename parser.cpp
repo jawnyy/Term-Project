@@ -119,11 +119,6 @@ void addChar() {
 void getChar() {
     nextChar = inputFile.get();
     if (inputFile.good()) {
-        if (nextChar == '\n') {
-            //cout << "Going from ---> " << countLineNumber << endl;
-            countLineNumber++;
-            //cout << "Now at ---> " << countLineNumber << endl;
-        }
         if (isalpha(nextChar)) {
             charClass = LETTER;
         }
@@ -133,6 +128,13 @@ void getChar() {
         else {
             charClass = UNKNOWN;
         }
+
+        if (nextChar == '\n') {
+            //cout << "Going from ---> " << countLineNumber << endl;
+            countLineNumber++;
+            //cout << "Now at ---> " << countLineNumber << endl;
+        }
+
     }
     else {
         charClass = EOF;
@@ -153,6 +155,7 @@ void getNonBlank() {
 int lex() {
     lexLen = 0;
     getNonBlank();
+    int lexLineNumber = countLineNumber;
     switch (charClass) {
         /* Parse identifiers */
         case LETTER:
@@ -192,7 +195,7 @@ int lex() {
     // Book way of showing the lexeme and its value
     // cout << "Next token is: " << nextToken << ", Next lexeme is " << lexeme << endl;
     
-    symbolTable[symbolTableIndex] =  {lexeme, nextToken, countLineNumber};
+    symbolTable[symbolTableIndex] =  {lexeme, nextToken, lexLineNumber};
     symbolTableIndex++;
     return nextToken;
 } /* End of function lex */
