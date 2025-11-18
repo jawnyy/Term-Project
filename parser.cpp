@@ -1,14 +1,8 @@
 #include "parser.hpp"
 
 int main() {
-    // Uncomment this later, for easier testing purposes.
-    /*
-    string fileName;
-    cout << "Enter file name: ";
-    cin >> fileName;
-    ifstream inputFile(fileName);
-    */
-    inputFile.open("input1.txt");
+    // Change the name of the file on the line below.
+    inputFile.open("input6.txt");
     int i = 1;
 
     if (!inputFile) {
@@ -21,13 +15,6 @@ int main() {
 
         inputFile.close();
     }
-
-    for (const auto& pair : symbolTable) {
-        cout << pair.first << ": {" << pair.second.name << ", "<< pair.second.type << ", " << pair.second.lineNumber << "}" << endl;
-        //check_semantics(pair.second.type);
-    }
-
-    cout << "\nStart of the output we should see \n\n";
 
     PROGRAM01();
 
@@ -130,9 +117,7 @@ void getChar() {
         }
 
         if (nextChar == '\n') {
-            //cout << "Going from ---> " << countLineNumber << endl;
             countLineNumber++;
-            //cout << "Now at ---> " << countLineNumber << endl;
         }
 
     }
@@ -166,7 +151,6 @@ int lex() {
                 getChar();
             }
             id_lookup(string(lexeme));
-            //nextToken = IDENT;
             break;
         /* Parse integer literals */
         case DIGIT:
@@ -192,9 +176,8 @@ int lex() {
             lexeme[3] = 0;
             break;
     } /* End of switch */
-    // Book way of showing the lexeme and its value
-    // cout << "Next token is: " << nextToken << ", Next lexeme is " << lexeme << endl;
-    
+
+    // Enter the values into the symbol table.
     symbolTable[symbolTableIndex] =  {lexeme, nextToken, lexLineNumber};
     symbolTableIndex++;
     return nextToken;
@@ -212,13 +195,13 @@ void CheckReservedWord() {
         point->second.name == "if" || point->second.name == "then" || point->second.name == "else" || 
         point->second.name == "input" || point->second.name == "output" || point->second.name == "int" || 
         point->second.name == "while" || point->second.name == "loop") {
-            cout << "Error, invalid identifier name!" << endl;
-            exit(1);
+            cout << "Error, cannot use reserved word as identifier name - line " << point->second.lineNumber <<"\n\n";
+            exit(99);
     } else {
         auto dupCheck = find(idTable.begin(), idTable.end(), point->second.name);
         if (dupCheck != idTable.end()) {
-            cout << "Duplicate id declaration found!" << endl;
-            exit(2);
+            cout << "Duplicate identifier declaration - found on line " << point->second.lineNumber << "\n\n";
+            exit(99);
         } else if (point->second.name != ",") {
             idTable.push_back(point->second.name);
         } 
@@ -252,8 +235,8 @@ void PROGRAM01() {
                 if (point->second.name == ";") {
                     // Program ended successfully!
                 } else {
-                    cout << "Expected a ';' here!\n";
-                    exit(99);
+                    cout << "Expected a ';' before line " << point->second.lineNumber << "\n\n";
+                    exit(1);
                 }
             } else if (pointNextNext->second.name == "end") {
                 NextLex();
@@ -262,12 +245,12 @@ void PROGRAM01() {
                 if (point->second.name == ";") {
                     // Program ended successfully!
                 } else {
-                    cout << "Expected a ';' here!\n";
-                    exit(99);
+                    cout << "Expected a ';' before line " << point->second.lineNumber << "\n\n";
+                    exit(1);
                 }
             } else {
-                cout << "Expected a 'end' here!\n";
-                exit(99);
+                cout << "Expected 'end' after line " << point->second.lineNumber << "\n\n";
+                exit(1);
             }
 
         } else {
@@ -297,8 +280,8 @@ void DECL03() {
     
     // Semicolon ends the line, else syntax error.
     if (point->second.name != ";") {
-        cout << "Expected semicolon!\n";
-        exit(4);
+        cout << "Expected semicolon before line " << point->second.lineNumber << "\n\n";
+        exit(3);
     }
 
     NextLex();
@@ -316,7 +299,7 @@ void ID_LIST04() {
     
     // If type is in identifier list, then error (no colon)
     if (point->second.name == "int" || point->second.name == "float" || point->second.name == "double") {
-        cout << "Expected colon in declaration section!\n";
+        cout << "Expected colon in declaration section before line " << point->second.lineNumber << "\n\n";
         exit(4);
     }
     
@@ -342,12 +325,12 @@ void ID05() {
             if (isalnum(point->second.name[i]) || point->second.name[i] == '_') {
                 continue;
             }else{
-                cout << point->second.name << " : Invalid character in identifier at " << point->first << endl;
+                cout << point->second.name << " : Invalid character in identifier at line " << point->second.lineNumber << "\n\n";
                 exit(5);
             }
         }
     }else{
-        cout << point->second.name << " : Invalid character in identifier at " << point->first << endl;
+        cout << point->second.name << " : Invalid character in identifier at line " << point->second.lineNumber << "\n\n";
         exit(5);
     }  
 }
@@ -381,7 +364,7 @@ void STMT07() {
             NextLex();
         } else {
             // Assuming that output follows right after the end of if loop.
-            cout << "Error, expected output here!\n";
+            cout << "Error, expected output on line " << point->second.lineNumber << "\n\n";
             exit(7);
         }
     } else if (point->second.name == "while") {
@@ -389,8 +372,6 @@ void STMT07() {
         NextLex();
         WHILESTMT10();
 
-        // TODO: Figure out if something needs to go here!!!
-        // Currently assumes that it no other statements follow (e.g. output)
         
     } else if (point->second.type == INPUT) {
         cout << "INPUT\n";
@@ -411,6 +392,13 @@ void STMT07() {
 void ASSIGN08() {
     // Checks if valid identifier.
     ID05(); 
+
+    auto idTableCheck = find(idTable.begin(), idTable.end(), point->second.name);
+    if (idTableCheck == idTable.end()) {
+        cout << "Variable not declared on line " << point->second.lineNumber << "\n\n";
+        exit(8);
+    }
+
     NextLex();
 
     int keyVal = point->first;
@@ -421,16 +409,10 @@ void ASSIGN08() {
         cout << "ASSIGN\n";
         NextLex();
         NextLex();
-        /*
-        auto idTableCheck = find(idTable.begin(), idTable.end(), point->second.name);
-        if (idTableCheck != idTable.end()) {
-        cout << "ID_LIST\n";
-        }*/
 
         EXPR13();
     } else {
-        cout << point->second.name << " : Not a valid assignment at " << point->first << endl;
-        cout << pointAt->second.name << pointNext->second.name << endl;
+        cout << "Not a valid assignment operator at line " << point->second.lineNumber << "\n\n";
         exit(8);
     }
 }
@@ -441,29 +423,28 @@ void IFSTMT09() {
 
     if (point->second.name == "then") {
         STMT_SEC06();
-        //NextLex();
 
         if (point->second.name == "else") {
             STMT_SEC06();
         }
-
+        
         if (point->second.name == "end") {
             NextLex();
             if (point->second.name == "if") {
                 NextLex();
                 if (point->second.name != ";") {
-                    cout << "Error, expected ';' at end of if loop!\n";
-                    exit(10);
+                    cout << "Expected ';' on line before " << point->second.lineNumber << "\n\n";
+                    exit(9);
                 } else {
                     NextLex();
                 }
             } else {
-                cout << "Error, expected 'if' at end of if loop!\n";
+                cout << "Expected 'if' on line " << point->second.lineNumber << "\n\n";
                 exit(9);
             }
         } else {
             cout << point->second.name << " at " << point->first << endl;
-            cout << "Error, expected 'end' at end of if loop!\n";
+            cout << "Expected 'end' on line " << point->second.lineNumber << "\n\n";
             exit(9);
         }
 
@@ -471,7 +452,6 @@ void IFSTMT09() {
 }
 
 void WHILESTMT10() {
-    // Done I think.
     // while COMP loop STMT_SEC end loop ;
     COMP17();
 
@@ -482,29 +462,26 @@ void WHILESTMT10() {
             if (point->second.name == "loop") {
                 NextLex();
                 if (point->second.name != ";") {
-                    cout << "Error, expected ';' at end of while loop!\n";
+                    cout << "Expected ';' on line before " << point->second.lineNumber << "\n\n";
                     exit(10);
                 } else {
                     int keyVal = point->first; // currently ';'
                     auto pointAt = symbolTable.find(keyVal);
                     auto pointNext = std::next(pointAt);
                     if (pointNext->second.name == "else"){
-                        //NextLex();
-                        //STMT_SEC06();
                         NextLex();
                     } else if (pointNext->second.name == "end") {
-                        // do something??
                         NextLex();
                     } else {
                         STMT_SEC06();
                     }
                 }
             } else {
-                cout << "Error, expected 'loop' at end of while loop!\n";
+                cout << "Expected 'loop' at line " << point->second.lineNumber << "\n\n";
                 exit(10);
             }
         } else {
-            cout << "Error, expected 'end' at end of while loop!\n";
+            cout << "Expected 'end' at line " << point->second.lineNumber << "\n\n";
             exit(10);
         }
     }
@@ -520,7 +497,7 @@ void INPUT11() {
                 NextLex();
                 INPUT11();
             } else {
-                cout << "Undeclared variable found! => " << point->second.name << endl;
+                cout << "Undeclared variable found on line " << point->second.lineNumber << "\n\n";
                 exit(11);
             }
         } else {
@@ -534,7 +511,6 @@ void INPUT11() {
 
 void OUTPUT12() {
     // It either goes to ID_LIST or NUM, this assumes no other possibility.
-    // TODO: May have to redo/add to this one!!!
     auto idTableCheck = find(idTable.begin(), idTable.end(), point->second.name);
     if (idTableCheck != idTable.end()) {
         cout << "ID_LIST\n";
@@ -562,7 +538,7 @@ void EXPR13() {
         if (isdigit(point->second.name[0])) {
             // skip
         } else {
-            cout << point->second.name << " : Variable not declared!\n";
+            cout << "Variable not declared on line " << point->second.lineNumber << "\n\n";
             exit(13);
         }
     }
@@ -574,19 +550,15 @@ void EXPR13() {
         }
     } else {
         int keyVal = point->first;
-        auto pointAt = symbolTable.find(keyVal); // points at ""
-        auto pointNext = std::next(pointAt); // points at ""
-        auto pointNextNext = std::next(pointNext); // point at ??
-        // cout << "First lex: " << pointAt->second.name << endl;
-        // cout << "Second lex: " << pointNext->second.name << endl;
-        // cout << "Third lex: " << pointNextNext->second.name << endl;
+        auto pointAt = symbolTable.find(keyVal);
+        auto pointNext = std::next(pointAt);
+        auto pointNextNext = std::next(pointNext);
 
         if (pointNextNext->second.name == "loop") {
             NextLex();
         } else if (pointNext->second.name == "else") {
             NextLex();
         } else {
-            //cout << "For future problems ---------> " << pointNext->second.name << endl;
             STMT_SEC06();
         }
     }
@@ -600,8 +572,8 @@ void FACTOR14() {
         if (isdigit(point->second.name[0])) {
             // skip
         } else {
-            cout << point->second.name << " : Variable not declared!\n";
-            exit(13);
+            cout << "Variable not declared on line " << point->second.lineNumber << "\n\n";
+            exit(14);
         }
     }
     OPERAND15();
@@ -613,20 +585,17 @@ void FACTOR14() {
 
 void OPERAND15() {
     // OPERAND -> NUM | ID | ( EXPR )
-    // TODO: IDK WHAT THIS REALLY MEANS LOL!!!!!
-    // If either of those 3 options (like TYPE func), then print OPERAND
     cout << "OPERAND\n";
     NextLex();
-    //NUM16();
 
 }
 
 void NUM16() {
-    // WARNING: Untested function!!!!
+    // (0 | 1 | ... | 9)+ [.(0 | 1 | ... | 9)+]
     int idLength = point->second.name.length() - 1;
 
-    if (idLength > 10) {
-        cout << point->second.name << " : Number too long!\n";
+    if (idLength > 9) {
+        cout << "Number too long on line " << point->second.lineNumber << "\n\n";
         exit(16);
     } else {
         if (isdigit(point->second.name[0])) {
@@ -634,12 +603,12 @@ void NUM16() {
                 if (isdigit(point->second.name[i]) || point->second.name == ".") {
                     continue;
                 }else{
-                    cout << point->second.name << " : Invalid character in number!\n";
+                    cout << "Invalid character in number on line " << point->second.lineNumber << "\n\n";
                     exit(16);
                 }
             }
         }else{
-            cout << point->second.name << " : Number must start with valid digit!\n";
+            cout << "Number must start with valid integer on line " << point->second.lineNumber << "\n\n";
             exit(16);
         }
     }
@@ -667,8 +636,8 @@ void COMP17() {
 
 void TYPE18() {
     if (point->second.name != "int" && point->second.name != "float" && point->second.name != "double") {
-        cout << "Error, wrong type declared!\n";
-        exit(1);
+        cout << "Error, wrong type declared on line " << point->second.lineNumber << "\n\n";
+        exit(18);
     }
 }
 
