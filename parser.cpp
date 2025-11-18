@@ -8,7 +8,7 @@ int main() {
     cin >> fileName;
     ifstream inputFile(fileName);
     */
-    inputFile.open("input5.txt");
+    inputFile.open("input1.txt");
     int i = 1;
 
     if (!inputFile) {
@@ -241,9 +241,9 @@ void PROGRAM01() {
             }
 
             int keyVal = point->first;
-            auto pointNext = symbolTable.find(keyVal);
+            auto pointAt = symbolTable.find(keyVal);
+            auto pointNext = std::next(pointAt);
             auto pointNextNext = std::next(pointNext);
-            auto pointNextNextNext = std::next(pointNextNext);
             if (point->second.name == "end") {
                 NextLex();
                 if (point->second.name == ";") {
@@ -252,7 +252,7 @@ void PROGRAM01() {
                     cout << "Expected a ';' here!\n";
                     exit(99);
                 }
-            } else if (pointNextNextNext->second.name == "end") {
+            } else if (pointNextNext->second.name == "end") {
                 NextLex();
                 NextLex();
                 NextLex();
@@ -483,12 +483,14 @@ void WHILESTMT10() {
                     exit(10);
                 } else {
                     int keyVal = point->first; // currently ';'
-                    auto pointNext = symbolTable.find(keyVal);
-                    auto pointNextNext = std::next(pointNext);
-                    //cout << point->second.name << pointNextNext->second.name << endl;
-                    if (pointNextNext->second.name == "else"){
+                    auto pointAt = symbolTable.find(keyVal);
+                    auto pointNext = std::next(pointAt);
+                    if (pointNext->second.name == "else"){
                         //NextLex();
                         //STMT_SEC06();
+                        NextLex();
+                    } else if (pointNext->second.name == "end") {
+                        // do something??
                         NextLex();
                     } else {
                         STMT_SEC06();
@@ -533,8 +535,18 @@ void OUTPUT12() {
     auto idTableCheck = find(idTable.begin(), idTable.end(), point->second.name);
     if (idTableCheck != idTable.end()) {
         cout << "ID_LIST\n";
-    } else {
+    } else if (isdigit(point->second.name[0])) {
         NUM16();
+        NextLex();
+
+        int keyVal = point->first;
+        auto pointAt = symbolTable.find(keyVal);
+        auto pointNext = std::next(pointAt);
+        if (pointNext->second.name == "end") {
+            NextLex();
+        } else {
+            STMT_SEC06();
+        }
     }
 }
 
@@ -559,19 +571,19 @@ void EXPR13() {
         }
     } else {
         int keyVal = point->first;
-        auto pointNext = symbolTable.find(keyVal); // points at ""
-        auto pointNextNext = std::next(pointNext); // points at ""
-        auto pointNextNextNext = std::next(pointNextNext); // point at ??
-        // cout << "First lex: " << pointNext->second.name << endl;
-        // cout << "Second lex: " << pointNextNext->second.name << endl;
-        // cout << "Third lex: " << pointNextNextNext->second.name << endl;
+        auto pointAt = symbolTable.find(keyVal); // points at ""
+        auto pointNext = std::next(pointAt); // points at ""
+        auto pointNextNext = std::next(pointNext); // point at ??
+        // cout << "First lex: " << pointAt->second.name << endl;
+        // cout << "Second lex: " << pointNext->second.name << endl;
+        // cout << "Third lex: " << pointNextNext->second.name << endl;
 
-        if (pointNextNextNext->second.name == "loop") {
+        if (pointNextNext->second.name == "loop") {
             NextLex();
-        } else if (pointNextNext->second.name == "else") {
+        } else if (pointNext->second.name == "else") {
             NextLex();
         } else {
-            //cout << "For future problems ---------> " << pointNextNext->second.name << endl;
+            //cout << "For future problems ---------> " << pointNext->second.name << endl;
             STMT_SEC06();
         }
     }
